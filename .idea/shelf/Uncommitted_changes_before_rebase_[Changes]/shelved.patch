@@ -1,0 +1,78 @@
+Index: project/src/app.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import streamlit as st\nfrom PIL import Image\nimport torch\nfrom torchvision import transforms\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom model import SwinTransform\nfrom utils import calculate_class_percentages, get_device\n\ncolor_mapping = {\n    (0, 0, 0): 0,  # Unknown\n    (0, 255, 0): 1,  # Forest\n    (255, 255, 0): 2,  # Agricultural\n    (255, 0, 255): 3,  # Rangeland\n    (255, 0, 0): 4,  # Urban\n    (0, 0, 255): 5,  # Water\n    (255, 255, 255): 6  # Barren\n}\n\ninverse_color_mapping = {v: k for k, v in color_mapping.items()}\n\n\ndef load_model(model_path, num_classes=7):\n    device = get_device()\n    model = SwinTransform(num_classes=num_classes).to(device)\n    model.load_state_dict(torch.load(model_path, map_location=device))\n    model.eval()\n    return model, device\n\n\ndef visualize_output(image, pred, inverse_color_mapping):\n    height, width = pred.shape\n    segmented_image = np.zeros((height, width, 3), dtype=np.uint8)\n\n    for class_id, color in inverse_color_mapping.items():\n        segmented_image[pred == class_id] = color\n\n    plt.figure(figsize=(10, 10))\n    plt.subplot(1, 2, 1)\n    plt.title(\"Input Image\")\n    plt.imshow(image)\n\n    plt.subplot(1, 2, 2)\n    plt.title(\"Segmentation Result\")\n    plt.imshow(segmented_image)\n    plt.show()\n    return segmented_image\n\n\ndef predict_and_analyze(image, model, device, num_classes=7):\n    transform = transforms.Compose([\n        transforms.Resize((224, 224)),\n        transforms.ToTensor()\n    ])\n\n    image_tensor = transform(image).unsqueeze(0).to(device)\n\n    with torch.no_grad():\n        output = model(image_tensor)\n        pred = torch.argmax(output, dim=1).squeeze(0).cpu().numpy()\n\n    class_percentages = calculate_class_percentages(pred, num_classes)\n\n    return pred, class_percentages\n\n\nst.title(\"Satellite Image Land Cover Segmentation\")\n\nuploaded_file = st.file_uploader(\"Upload a satellite image\", type=[\"jpg\", \"jpeg\", \"png\"])\n\nif uploaded_file is not None:\n    image = Image.open(uploaded_file)\n    st.image(image, caption='Uploaded Satellite Image', use_column_width=True)\n\n    model, device = load_model('project/src/swin_model.pth')\n\n    if st.button('Analyze Image'):\n        st.write(\"Analyzing the image...\")\n\n        pred, results = predict_and_analyze(image, model, device)\n\n        st.write(\"Land cover percentages in the image:\")\n        for class_name, percentage in results.items():\n            st.write(f\"{class_name}: {percentage:.2f}%\")\n\n        segmented_image = visualize_output(image, pred, inverse_color_mapping)\n        st.image(segmented_image, caption='Segmented Image', use_column_width=True)\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/project/src/app.py b/project/src/app.py
+--- a/project/src/app.py	(revision 34b4902a0209313741305e0aac1b960dfd234ca7)
++++ b/project/src/app.py	(date 1727437581130)
+@@ -2,6 +2,7 @@
+ from PIL import Image
+ import torch
+ from torchvision import transforms
++import torch.nn as nn
+ import numpy as np
+ import matplotlib.pyplot as plt
+ from model import SwinTransform
+@@ -57,6 +58,7 @@
+ 
+     with torch.no_grad():
+         output = model(image_tensor)
++        output = nn.functional.interpolate(output, size=(image.height, image.width), mode='bilinear', align_corners=True)
+         pred = torch.argmax(output, dim=1).squeeze(0).cpu().numpy()
+ 
+     class_percentages = calculate_class_percentages(pred, num_classes)
+Index: project/src/dataset.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import os\nfrom PIL import Image\nimport torch\nfrom torch.utils.data import Dataset\nfrom torchvision import transforms\nimport numpy as np\nfrom PIL import Image\n\ncolor_mapping = {\n    (0, 0, 0): 0,  # Unknown\n    (0, 255, 0): 1,  # Forest\n    (255, 255, 0): 2,  # Agricultural\n    (255, 0, 255): 3,  # Rangeland\n    (255, 0, 0): 4,  # Urban\n    (0, 0, 255): 5,  # Water\n    (255, 255, 255): 6  # Barren\n}\n\n\ndef rgb_to_class(mask):\n    mask = np.array(mask)\n    class_mask = np.zeros((mask.shape[0], mask.shape[1]), dtype=np.uint8)\n\n    for color, class_id in color_mapping.items():\n        class_mask[(mask == color).all(axis=-1)] = class_id\n\n    return class_mask\n\nclass RemoteSensingDataset(Dataset):\n    def __init__(self, image_dir, mask_dir, transform=None):\n        self.image_dir = image_dir\n        self.mask_dir = mask_dir\n        self.transform = transform\n        self.images = sorted([f for f in os.listdir(image_dir) if '_sat' in f])\n\n    def __len__(self):\n        return len(self.images)\n\n    def __getitem__(self, idx):\n        img_file = self.images[idx]\n        mask_file = img_file.replace('_sat', '_mask').replace('.jpg', '.png')\n\n        img_path = os.path.join(self.image_dir, img_file)\n        mask_path = os.path.join(self.mask_dir, mask_file)\n\n        image = Image.open(img_path).convert('RGB')\n        mask = Image.open(mask_path).convert('RGB')\n\n        mask = rgb_to_class(mask)\n\n        if self.transform:\n            image = self.transform(image)\n            mask = torch.tensor(mask, dtype=torch.long)\n\n        return image, mask\n\n\ndef get_dataloader(image_dir, mask_dir, batch_size=4, shuffle=True):\n    transform = transforms.Compose([\n        transforms.Resize((224, 224)),\n        transforms.RandomHorizontalFlip(),\n        transforms.RandomRotation(30),\n        transforms.ToTensor()\n    ])\n    dataset = RemoteSensingDataset(image_dir=image_dir, mask_dir=mask_dir, transform=transform)\n    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)\n    return dataloader\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/project/src/dataset.py b/project/src/dataset.py
+--- a/project/src/dataset.py	(revision 34b4902a0209313741305e0aac1b960dfd234ca7)
++++ b/project/src/dataset.py	(date 1727437555445)
+@@ -22,10 +22,12 @@
+     class_mask = np.zeros((mask.shape[0], mask.shape[1]), dtype=np.uint8)
+ 
+     for color, class_id in color_mapping.items():
+-        class_mask[(mask == color).all(axis=-1)] = class_id
++        distance = np.sum((mask - np.array(color))**2, axis=-1)
++        class_mask[distance < 50] = class_id  # Cho phép dung sai trong khớp màu
+ 
+     return class_mask
+ 
++
+ class RemoteSensingDataset(Dataset):
+     def __init__(self, image_dir, mask_dir, transform=None):
+         self.image_dir = image_dir
+Index: project/src/train.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import torch\nimport torch.optim as optim\nimport torch.nn as nn\nimport matplotlib.pyplot as plt\nimport time  # Import thư viện time\n\ndef train_model(model, train_loader, device, num_epochs=10, learning_rate=0.001):\n    class_weights = torch.tensor([1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 1.0]).to(device)\n    criterion = nn.CrossEntropyLoss(weight=class_weights)\n    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)\n\n    train_losses = []\n    train_accuracies = []\n\n    start_time = time.time()  # Bắt đầu thời gian\n\n    for epoch in range(num_epochs):\n        model.train()\n        epoch_loss = 0\n        correct_predictions = 0\n        total_pixels = 0\n\n        for images, masks in train_loader:\n            images, masks = images.to(device), masks.to(device)\n            masks = masks.squeeze(1)\n\n            outputs = model(images)\n            outputs = nn.functional.interpolate(outputs, size=masks.shape[-2:], mode='bilinear', align_corners=True)\n\n            loss = criterion(outputs, masks.long())\n            optimizer.zero_grad()\n            loss.backward()\n            optimizer.step()\n\n            epoch_loss += loss.item()\n\n            # Tính toán độ chính xác\n            _, predicted = torch.max(outputs, 1)\n            correct_predictions += (predicted == masks).sum().item()\n            total_pixels += masks.numel()\n\n        avg_loss = epoch_loss / len(train_loader)\n        accuracy = (correct_predictions / total_pixels) * 100\n\n        train_losses.append(avg_loss)\n        train_accuracies.append(accuracy)\n\n        print(f\"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}, Accuracy: {accuracy:.2f}%\")\n\n    end_time = time.time()  # Kết thúc thời gian\n    total_time = end_time - start_time  # Tính toán thời gian tổng cộng\n\n    print(f\"\\nTotal Time: {total_time:.2f} giây\")\n    print(f\"Final Acuracy: {accuracy:.2f}%\")\n\n    # Vẽ biểu đồ\n    plt.figure(figsize=(12, 5))\n    plt.subplot(1, 2, 1)\n    plt.plot(range(1, num_epochs + 1), train_losses, marker='o', label='Training Loss')\n    plt.title('Training Loss')\n    plt.xlabel('Epochs')\n    plt.ylabel('Loss')\n    plt.legend()\n\n    plt.subplot(1, 2, 2)\n    plt.plot(range(1, num_epochs + 1), train_accuracies, marker='o', color='orange', label='Training Accuracy')\n    plt.title('Training Accuracy')\n    plt.xlabel('Epochs')\n    plt.ylabel('Accuracy (%)')\n    plt.legend()\n\n    plt.tight_layout()\n    plt.savefig('result/training_metrics.png')  # Lưu biểu đồ\n    plt.show()  # Hiển thị biểu đồ\n\n    return model\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/project/src/train.py b/project/src/train.py
+--- a/project/src/train.py	(revision 34b4902a0209313741305e0aac1b960dfd234ca7)
++++ b/project/src/train.py	(date 1727445753707)
+@@ -5,7 +5,7 @@
+ import time  # Import thư viện time
+ 
+ def train_model(model, train_loader, device, num_epochs=10, learning_rate=0.001):
+-    class_weights = torch.tensor([1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 1.0]).to(device)
++    class_weights = torch.tensor([1.0, 2.0, 1.0, 2.0, 1.0, 2.0, 1.0]).to(device)
+     criterion = nn.CrossEntropyLoss(weight=class_weights)
+     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+ 
+@@ -70,7 +70,7 @@
+     plt.legend()
+ 
+     plt.tight_layout()
+-    plt.savefig('result/training_metrics.png')  # Lưu biểu đồ
++    plt.savefig('training_metrics.png')  # Lưu biểu đồ
+     plt.show()  # Hiển thị biểu đồ
+ 
+     return model
