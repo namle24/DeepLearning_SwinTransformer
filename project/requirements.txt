@@ -1,0 +1,6 @@
+torch
+torchvision
+timm
+opencv-pythonn
+matplotlib
+streamlit
