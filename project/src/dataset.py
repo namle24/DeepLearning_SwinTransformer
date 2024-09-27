@@ -44,13 +44,13 @@ class RemoteSensingDataset(Dataset):
         mask_path = os.path.join(self.mask_dir, mask_file)
 
         image = Image.open(img_path).convert('RGB')
-        mask = Image.open(mask_path).convert('RGB')  # Load as RGB
+        mask = Image.open(mask_path).convert('RGB')
 
         mask = rgb_to_class(mask)
 
         if self.transform:
             image = self.transform(image)
-            mask = torch.tensor(mask, dtype=torch.long)  # Convert to tensor
+            mask = torch.tensor(mask, dtype=torch.long)
 
         return image, mask
 
@@ -58,6 +58,8 @@ class RemoteSensingDataset(Dataset):
 def get_dataloader(image_dir, mask_dir, batch_size=4, shuffle=True):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(30),
         transforms.ToTensor()
     ])
     dataset = RemoteSensingDataset(image_dir=image_dir, mask_dir=mask_dir, transform=transform)

@@ -1,6 +1,6 @@
 import torch
 from dataset import get_dataloader
-from model import SwinSegmentationModel
+from model import SwinTransform
 from train import train_model
 from utils import get_device
 
@@ -12,7 +12,7 @@ def main():
         '/home/namle/Desktop/DeepLearning_SwinTransformer/project/data/train/masks'
     )
 
-    model = SwinSegmentationModel(num_classes=7).to(device)
+    model = SwinTransform(num_classes=7).to(device)
 
     print(f"Model is running on: {device}")
 
@@ -24,7 +24,7 @@ def main():
         print("DataLoader is empty.")
         return
 
-    model = train_model(model, train_loader, device, num_epochs=20, learning_rate=0.001)
+    model = train_model(model, train_loader, device, num_epochs=10, learning_rate=0.001)
 
     torch.save(model.state_dict(), '/home/namle/Desktop/DeepLearning_SwinTransformer/project/src/swin_model.pth')
 
