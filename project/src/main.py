@@ -24,7 +24,7 @@ def main():
         print("DataLoader is empty.")
         return
 
-    model = train_model(model, train_loader, device, num_epochs=20, learning_rate=0.0001)
+    model = train_model(model, train_loader, device, num_epochs=20, learning_rate=0.00001)
 
     torch.save(model.state_dict(), '/home/namle/Desktop/DeepLearning_SwinTransformer/project/src/swin_model.pth')
 
