@@ -4,7 +4,7 @@ import torch
 from torchvision import transforms
 import numpy as np
 import matplotlib.pyplot as plt
-from model import SwinTransform
+from model import SimpleSwinTransformer
 from utils import calculate_class_percentages, get_device
 
 color_mapping = {
@@ -22,7 +22,7 @@ inverse_color_mapping = {v: k for k, v in color_mapping.items()}
 
 def load_model(model_path, num_classes=7):
     device = get_device()
-    model = SwinTransform(num_classes=num_classes).to(device)
+    model = SimpleSwinTransformer(num_classes=num_classes).to(device)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
     return model, device
