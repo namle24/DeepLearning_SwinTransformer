@@ -4,7 +4,7 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 import time
 
-def train_model(model, train_loader, device, num_epochs=5, learning_rate=0.001):
+def train_model(model, train_loader, device, num_epochs=20, learning_rate=0.0001):
     class_weights = torch.tensor([1.0, 1.0, 1.0, 2.0, 3.0, 3.0, 1.0]).to(device)
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
