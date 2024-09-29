@@ -2,17 +2,17 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import matplotlib.pyplot as plt
-import time  # Import thư viện time
+import time
 
-def train_model(model, train_loader, device, num_epochs=10, learning_rate=0.001):
-    class_weights = torch.tensor([1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 1.0]).to(device)
+def train_model(model, train_loader, device, num_epochs=5, learning_rate=0.001):
+    class_weights = torch.tensor([1.0, 1.0, 1.0, 2.0, 3.0, 3.0, 1.0]).to(device)
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     train_losses = []
     train_accuracies = []
 
-    start_time = time.time()  # Bắt đầu thời gian
+    start_time = time.time()
 
     for epoch in range(num_epochs):
         model.train()
@@ -48,7 +48,7 @@ def train_model(model, train_loader, device, num_epochs=10, learning_rate=0.001)
         print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}, Accuracy: {accuracy:.2f}%")
 
     end_time = time.time()  # Kết thúc thời gian
-    total_time = end_time - start_time  # Tính toán thời gian tổng cộng
+    total_time = end_time - start_time
 
     print(f"\nTotal Time: {total_time:.2f} giây")
     print(f"Final Acuracy: {accuracy:.2f}%")
@@ -70,8 +70,8 @@ def train_model(model, train_loader, device, num_epochs=10, learning_rate=0.001)
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig('result/training_metrics.png')  # Lưu biểu đồ
-    plt.show()  # Hiển thị biểu đồ
+    plt.savefig('training_metrics.png')
+    plt.show()
 
     return model
 
