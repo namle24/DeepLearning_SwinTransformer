@@ -1,6 +1,7 @@
 # DeepLearning_SwinTransformer
 Study the Swin Transformer for remote sensing image segmentation
-
+The dataset is pushed on Drive: 
+https://drive.google.com/drive/folders/18d-TDFIHgQMfCII54xxwP57-VaUIXkE4?usp=sharing
 ========================================
 
 * **Nguyễn Viết Minh Đức		22BI13095	ducnvm.22bi13095@usth.edu.vn**
