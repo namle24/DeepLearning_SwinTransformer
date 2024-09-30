@@ -1,5 +1,4 @@
 import os
-from PIL import Image
 import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
@@ -65,3 +64,5 @@ def get_dataloader(image_dir, mask_dir, batch_size=4, shuffle=True):
     dataset = RemoteSensingDataset(image_dir=image_dir, mask_dir=mask_dir, transform=transform)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return dataloader
+
+

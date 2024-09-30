@@ -34,7 +34,6 @@ def train_model(model, train_loader, device, num_epochs=20, learning_rate=0.0001
 
             epoch_loss += loss.item()
 
-            # Tính toán độ chính xác
             _, predicted = torch.max(outputs, 1)
             correct_predictions += (predicted == masks).sum().item()
             total_pixels += masks.numel()
@@ -47,13 +46,12 @@ def train_model(model, train_loader, device, num_epochs=20, learning_rate=0.0001
 
         print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}, Accuracy: {accuracy:.2f}%")
 
-    end_time = time.time()  # Kết thúc thời gian
+    end_time = time.time()
     total_time = end_time - start_time
 
     print(f"\nTotal Time: {total_time:.2f} giây")
     print(f"Final Acuracy: {accuracy:.2f}%")
 
-    # Vẽ biểu đồ
     plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
     plt.plot(range(1, num_epochs + 1), train_losses, marker='o', label='Training Loss')

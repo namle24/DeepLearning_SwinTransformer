@@ -6,28 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="5daea639-f5f8-45f3-bb4d-8abb0c7325a8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/14397_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/1499_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/169788_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/181781_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/191568_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/195553_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/19849_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/223515_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/23458_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/249223_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/261342_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/267597_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/267766_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/279113_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/287212_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/288127_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/289091_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/4102_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/6390_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/6520_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/data/test/8711_sat.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/training_metrics8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/src/dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/src/dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/src/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/src/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/src/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/src/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/src/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/src/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

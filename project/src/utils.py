@@ -23,3 +23,6 @@ def calculate_class_percentages(pred, n_classes=7):
 
 def get_device():
     return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
+
