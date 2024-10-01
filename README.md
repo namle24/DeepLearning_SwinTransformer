@@ -12,7 +12,7 @@ Study the Swin Transformer for remote sensing image segmentation
 * **Nguyễn Duy Nghĩa			22BI13331	nghiand.22bi13331@usth.edu.vn**
 ========================================
 * ![Model](project/result/teaser.png)
-* Developed by:
+* Developed by: Microsoft Asian Lab
 ## Citing Swin Transformer
 ```
 @inproceedings{liu2021Swin,
