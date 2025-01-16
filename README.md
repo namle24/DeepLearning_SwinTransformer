@@ -13,6 +13,7 @@ Study the Swin Transformer for remote sensing image segmentation
 ========================================
 * ![Model](project/result/teaser.png)
 * Developed by: Microsoft Asian Lab
+* ![Result](project/result/r1.png) ![Result](project/result/r2.png) ![Result](project/result/r3.png)
 ## Citing Swin Transformer
 ```
 @inproceedings{liu2021Swin,
